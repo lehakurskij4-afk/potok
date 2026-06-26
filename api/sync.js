@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://qgmzuhprvbdwjgtwajei.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFnbXp1aHBydmJkd2pndHdhamVpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyMzQ5NDcsImV4cCI6MjA5NzgxMDk0N30.lZ_qaVEZ1UR4btb2VvgD60sGH39fa10hj2iCB9wFo8I';
+const SUPABASE_URL = 'https://rvqtjdmbgujrajrbynyj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2cXRqZG1iZ3VqcmFqcmJ5bnlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NzkwMTEsImV4cCI6MjA5ODA1NTAxMX0.qr7p-EYhekiD_cf3M2rUq9YfYEGXH1Ut_OBYe9LwrJA';
 const TABLE = 'app_state';
 const ROW_KEY = 'planner_data';
 
