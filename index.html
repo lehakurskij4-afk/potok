@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <!-- Настройки для PWA и превращения в приложение на iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Поток">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#050506">
+
+  <!-- Ссылка на иконку (нужно будет добавить картинку) -->
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Поток</title>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/day.css">
+  <link rel="stylesheet" href="css/month.css">
+  <link rel="stylesheet" href="css/finance.css">
+  <link rel="stylesheet" href="css/deadlines.css">
+  <link rel="stylesheet" href="css/ideas.css">
+</head>
+<body>
+
+  <!-- Sidebar (desktop, >768px) -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-title">✦</div>
+    <a class="sidebar-btn" data-view="plan" onclick="navTo('plan')">
+      <span class="sidebar-icon">📅</span>
+    </a>
+    <a class="sidebar-btn" data-view="home" onclick="navTo('home')">
+      <span class="sidebar-icon">🏠</span>
+    </a>
+    <a class="sidebar-btn" data-view="ideas" onclick="navTo('ideas')">
+      <span class="sidebar-icon">💡</span>
+    </a>
+  </nav>
+
+  <div class="sync-status" id="syncStatus">
+    <div class="sync-dot"></div>
+    <span id="syncText">Синхронизация...</span>
+  </div>
+
+  <div class="xp-toast" id="xpToast">
+    <span class="xp-toast-icon">⚡</span>
+    <span id="xpToastText">+10 XP</span>
+  </div>
+
+  <div id="app"></div>
+
+  <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <!-- Tab bar (mobile, ≤768px) -->
+  <nav class="tabbar" id="tabbar">
+    <a class="tabbar-btn" data-view="plan" onclick="navTo('plan')">
+      <span class="tabbar-icon">📅</span>
+      <span class="tabbar-label">План</span>
+    </a>
+    <a class="tabbar-btn" data-view="home" onclick="navTo('home')">
+      <span class="tabbar-icon">🏠</span>
+      <span class="tabbar-label">Главная</span>
+    </a>
+    <a class="tabbar-btn" data-view="ideas" onclick="navTo('ideas')">
+      <span class="tabbar-icon">💡</span>
+      <span class="tabbar-label">Проекты</span>
+    </a>
+  </nav>
+
+  <script src="js/state.js?v=3"></script>
+  <script src="js/date-picker.js?v=2"></script>
+  <script src="js/charts.js?v=2"></script>
+  <script src="js/home.js?v=2"></script>
+  <script src="js/day.js?v=3"></script>
+  <script src="js/month.js?v=2"></script>
+  <script src="js/finance.js?v=2"></script>
+  <script src="js/deadlines.js?v=2"></script>
+  <script src="js/ideas.js?v=2"></script>
+  <script src="js/sleep.js?v=2"></script>
+  <script src="js/render.js?v=2"></script>
+</body>
+</html>
