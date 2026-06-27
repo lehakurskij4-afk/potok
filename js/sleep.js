@@ -10,6 +10,7 @@ function buildSleepPage() {
     const sl = getSleep(y, m, dd);
     const dur = calcDuration(sl.bed, sl.wake);
     const isToday = y === ACT_Y && m === ACT_M && dd === ACT_D;
+    const dayIdx = d.getDay() === 0 ? 6 : d.getDay() - 1;
     const wd = WEEKDAYS_SHORT[d.getDay()];
     days.push({ y, m, d: dd, sl, dur, isToday, wd, dateStr: `${dd}.${m + 1}` });
   }
@@ -26,6 +27,9 @@ function buildSleepPage() {
     const durStr = day.dur > 0 ? formatDuration(day.dur) : '—';
     const quality = day.sl.quality || 0;
     const dayKey = `${day.y}-${day.m}-${day.d}`;
+    
+    // ✦ Проверяем, есть ли в дне хоть какие-то данные
+    const hasData = day.sl.bed || day.sl.wake || quality > 0;
 
     daysHTML += `
       <div class="sleep-day-card ${day.isToday ? 'is-today' : ''}">
@@ -34,18 +38,21 @@ function buildSleepPage() {
             ${day.isToday ? '📍 ' : ''}${day.d} ${MONTHS_SHORT[day.m]}
             <span class="sleep-day-wd">${day.wd}</span>
           </div>
-          <div class="sleep-day-dur">${durStr}</div>
+          <div style="display:flex; align-items:center; gap: 12px;">
+            <div class="sleep-day-dur">${durStr}</div>
+            ${hasData ? `<button onclick="clearSleepForDay(${day.y},${day.m},${day.d})" style="background:none; border:none; color:var(--red, #ef4444); font-size:16px; padding:0; cursor:pointer;" title="Сбросить">✕</button>` : ''}
+          </div>
         </div>
         <div class="sleep-day-fields">
           <label class="sleep-day-field">
             <span class="sleep-day-label">🌙 Лёг</span>
             <input type="time" class="sleep-day-input" value="${day.sl.bed || ''}"
-              onchange="saveSleepForDay(${day.y},${day.m},${day.d},'bed',this.value)">
+              onblur="saveSleepForDay(${day.y},${day.m},${day.d},'bed',this.value)">
           </label>
           <label class="sleep-day-field">
             <span class="sleep-day-label">☀️ Встал</span>
             <input type="time" class="sleep-day-input" value="${day.sl.wake || ''}"
-              onchange="saveSleepForDay(${day.y},${day.m},${day.d},'wake',this.value)">
+              onblur="saveSleepForDay(${day.y},${day.m},${day.d},'wake',this.value)">
           </label>
         </div>
         <div class="sleep-day-quality">
@@ -98,9 +105,9 @@ function buildSleepPage() {
     </div>
 
     <div class="sleep-nav">
-      <button class="btn-secondary" onclick="sleepNav(7)">← 7 дн.</button>
-      <button class="btn-secondary" onclick="sleepNav(0)">Сегодня</button>
-      <button class="btn-secondary" onclick="sleepNav(-7)">7 дн. →</button>
+      <button class="btn-secondary" onclick="sleepNav(-7)">← 7 дн.</button>
+      <button class="btn-secondary" onclick="sleepNav('today')">Сегодня</button>
+      <button class="btn-secondary" onclick="sleepNav(7)">7 дн. →</button>
     </div>
 
     <div class="sleep-days-list">
@@ -110,7 +117,11 @@ function buildSleepPage() {
 }
 
 function sleepNav(offset) {
-  sleepViewOffset = offset;
+  if (offset === 'today') {
+    sleepViewOffset = 0; // Сбрасываем на сегодняшний день
+  } else {
+    sleepViewOffset += offset; // ✦ Теперь мы ПРИБАВЛЯЕМ или ВЫЧИТАЕМ дни!
+  }
   render();
 }
 
@@ -123,4 +134,11 @@ function saveSleepForDay(y, m, d, field, value) {
   }
   saveSleep(y, m, d, sl);
   render();
+}
+
+function clearSleepForDay(y, m, d) {
+  if (confirm('Сбросить данные сна за этот день?')) {
+    saveSleep(y, m, d, { bed: '', wake: '', quality: 0 });
+    render();
+  }
 }
