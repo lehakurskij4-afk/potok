@@ -23,13 +23,15 @@ function buildHome() {
     dayTasksHTML = `<div class="empty-state" style="padding:8px 0">Нет задач на сегодня</div>`;
   } else {
     preview.forEach((t, i) => {
+      const folderIcon = ICONS[t.ideaEmoji] || ICONS.folder;
+      const iconHtml = t.fromIdea ? `<span style="opacity:0.5">${folderIcon}</span>` : '';
       dayTasksHTML += `<div class="day-task-mini" onclick="toggleTodayTask(${i})" style="cursor:pointer"
         draggable="true" data-idx="${i}" data-flip-id="ht-${flipKey(t.text)}"
         ondragstart="homeDragStart(event,${i})" ondragover="homeDragOver(event)"
         ondrop="homeDrop(event,${i})" ondragend="homeDragEnd(event)">
         <span class="task-drag" title="Перетащить">⋮⋮</span>
         <div class="mini-check ${t.done ? 'done' : ''}">${t.done ? '✓' : ''}</div>
-        <span class="mini-task-text ${t.done ? 'completed' : ''}">${t.fromIdea ? '<span style="opacity:0.5;font-size:10px">' + esc(t.ideaEmoji || '📁') + '</span> ' : ''}${esc(t.text)}</span>
+        <span class="mini-task-text ${t.done ? 'completed' : ''}">${iconHtml}${esc(t.text)}</span>
       </div>`;
     });
     if (allTasks.length > 3) {
@@ -83,7 +85,7 @@ function buildHome() {
             const s = getStreak();
             const abs = Math.abs(s);
             const active = s > 0;
-            return `<div class="streak-badge ${active ? 'active' : 'pending'}">🔥 ${abs} дн.</div>`;
+            return `<div class="streak-badge ${active ? 'active' : 'pending'}">${ICONS.fire}${abs} дн.</div>`;
           })()}
         </div>
 
@@ -95,13 +97,13 @@ function buildHome() {
         <div class="water-cups">
           ${Array.from({length:6}, (_,i) =>
             `<div class="water-cup ${i < water.cups ? 'filled' : ''}" onclick="toggleWaterCup(${i})">
-              ${i < water.cups ? '💧' : '○'}
+              ${i < water.cups ? ICONS.waterFull : ICONS.waterEmpty}
             </div>`).join('')}
           <div class="water-info">${water.cups * 500} мл / 3000 мл</div>
         </div>
 
         <div class="day-tasks-col">
-          <div class="section-eyebrow" style="margin-bottom:8px">✅ Задачи <span class="badge badge-green">${doneT}/${totalT}</span></div>
+          <div class="section-eyebrow" style="margin-bottom:8px">${ICONS.task} Задачи <span class="badge badge-green">${doneT}/${totalT}</span></div>
           ${dayTasksHTML}
         </div>
 
@@ -130,6 +132,56 @@ function buildHome() {
       <div class="panel-arrow">→</div>
     </div>
 
+    <div class="panel panel-habits" onclick="openHabits()">
+      <div class="panel-inner">
+        <div class="panel-eyebrow">Трекер привычек</div>
+        <div class="panel-title">Привычки</div>
+        ${(() => {
+          if (typeof getHabits !== 'function') return ''; 
+          const habs = getHabits();
+          if (habs.length === 0) return `<div class="empty-state" style="padding:12px 0;font-size:13px">Нет привычек</div>`;
+          const today = activeDateStr();
+          const doneCount = habs.filter(h => h.history && h.history[today]).length;
+          const pct = Math.round((doneCount / Math.max(habs.length, 1)) * 100);
+          return `
+            <div style="font-size: 24px; font-weight: 800; margin: 10px 0;">${doneCount} / ${habs.length}</div>
+            <div style="font-size: 13px; color: var(--text-tertiary); margin-bottom: 8px;">Выполнено сегодня</div>
+            <div class="mc-bar"><div class="mc-bar-fill" style="width:${pct}%"></div></div>
+          `;
+        })()}
+      </div>
+      <div class="panel-arrow">→</div>
+    </div>
+
+    <div class="panel panel-sleep" onclick="openSleep()">
+      <div class="panel-inner">
+        <div class="panel-eyebrow">Трекер сна</div>
+        <div class="panel-title">Сон</div>
+        ${(() => {
+          const sl = getSleep(ACT_Y, ACT_M, ACT_D);
+          const dur = calcDuration(sl.bed, sl.wake);
+          if (sl.bed && sl.wake) {
+            return `
+              <div class="sleep-mini">
+                <div class="sleep-mini-stat">
+                  <div class="sleep-mini-num">${formatDuration(dur)}</div>
+                  <div class="sleep-mini-lbl">Сегодня</div>
+                </div>
+                <div class="sleep-mini-times">
+                  <span>${ICONS.moon}${sl.bed}</span>
+                  <span>${ICONS.sun}${sl.wake}</span>
+                </div>
+                <div class="sleep-mini-quality" style="color:${sl.quality >= 8 ? 'var(--green)' : sl.quality >= 5 ? 'var(--blue)' : 'var(--red)'}">Качество: ${sl.quality}/10</div>
+              </div>
+            `;
+          } else {
+            return `<div class="sleep-mini-empty">Сегодня ещё не заполнено</div>`;
+          }
+        })()}
+      </div>
+      <div class="panel-arrow">→</div>
+    </div>
+
     <div class="panel panel-finance" onclick="openFinance()">
       <div class="panel-inner">
         <div class="panel-eyebrow">Финансы</div>
@@ -151,59 +203,6 @@ function buildHome() {
       <div class="panel-arrow">→</div>
     </div>
 
-    <div class="panel panel-sleep" onclick="openSleep()">
-      <div class="panel-inner">
-        <div class="panel-eyebrow">Трекер сна</div>
-        <div class="panel-title">Сон</div>
-        ${(() => {
-          const sl = getSleep(ACT_Y, ACT_M, ACT_D);
-          const dur = calcDuration(sl.bed, sl.wake);
-          if (sl.bed && sl.wake) {
-            return `
-              <div class="sleep-mini">
-                <div class="sleep-mini-stat">
-                  <div class="sleep-mini-num">${formatDuration(dur)}</div>
-                  <div class="sleep-mini-lbl">Сегодня</div>
-                </div>
-                <div class="sleep-mini-times">
-                  <span>🌙 ${sl.bed}</span>
-                  <span>☀️ ${sl.wake}</span>
-                </div>
-                <div class="sleep-mini-quality" style="color:${sl.quality >= 8 ? 'var(--green)' : sl.quality >= 5 ? 'var(--blue)' : 'var(--red)'}">Качество: ${sl.quality}/10</div>
-              </div>
-            `;
-          } else {
-            return `<div class="sleep-mini-empty">Сегодня ещё не заполнено</div>`;
-          }
-        })()}
-      </div>
-      <div class="panel-arrow">→</div>
-    </div>
-
-    <div class="panel panel-deadlines" onclick="openDeadlines()">
-      <div class="panel-inner">
-        <div class="panel-eyebrow">Дедлайны</div>
-        <div class="panel-title">Сроки</div>
-        ${(() => {
-          const allDl = getAllDeadlines().filter(d => !d.done);
-          if (allDl.length === 0) {
-            return `<div class="empty-state" style="padding:12px 0;font-size:13px">Нет активных дедлайнов</div>`;
-          }
-          let html = '';
-          allDl.slice(0, 3).forEach(item => {
-            const days = daysUntil(item.deadline);
-            const cls = days < 0 ? 'overdue' : days <= 3 ? 'urgent' : 'normal';
-            html += `<div class="deadline-mini ${cls}">
-              <div class="deadline-mini-text">${esc(item.text)}</div>
-              <div class="deadline-mini-count">${days < 0 ? 'просрочено' : days === 0 ? 'Сегодня!' : days + ' дн.'}</div>
-            </div>`;
-          });
-          return html;
-        })()}
-      </div>
-      <div class="panel-arrow">→</div>
-    </div>
-
     <div class="panel panel-ideas" onclick="openIdeas()">
       <div class="panel-inner">
         <div class="panel-eyebrow">База идей</div>
@@ -217,9 +216,9 @@ function buildHome() {
           ideas.slice(0, 3).forEach(p => {
             const total = p.tasks.length;
             const done = p.tasks.filter(t => t.done).length;
-            const pct = total > 0 ? Math.round(done / total * 100) : 0;
+            const pct = total > 0 ? Math.round(done / Math.max(total, 1) * 100) : 0;
             html += `<div class="idea-mini">
-              <span class="idea-mini-emoji">${p.emoji || '📁'}</span>
+              <span class="idea-mini-emoji" style="display:flex;align-items:center">${ICONS[p.emoji] || ICONS.folder}</span>
               <span class="idea-mini-name">${esc(p.name)}</span>
               <span class="idea-mini-pct">${done}/${total}</span>
             </div>`;
