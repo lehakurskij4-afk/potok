@@ -14,10 +14,19 @@ function buildDayPage() {
   allTasks.forEach((t, i) => {
     const hasDeadline = t.deadline && !t.done;
     const isUrgent = t.urgent && !t.done;
-    const dlBadge = t.deadline ? `<span class="task-deadline-badge ${t.done ? 'done' : ''}">${formatDateDisplay(t.deadline)}</span>` : '';
     const urgentCls = isUrgent ? 'urgent-row' : '';
     const urgentBtn = isUrgent ? 'active' : '';
-    const ideaTag = t.fromIdea ? `<span class="idea-tag" title="Из проекта">${esc(t.ideaEmoji || ICONS.folder)}</span>` : '';
+    const ideaTag = t.fromIdea ? `<span class="idea-tag" title="Из проекта" style="display:inline-flex; align-items:center; margin-right:4px;">${ICONS[t.ideaEmoji] || ICONS.folder}</span>` : '';
+    
+    let bottomItems = '';
+    if (!t.done) {
+      bottomItems += `<button class="task-urgent-btn ${urgentBtn}" onclick="toggleDayTaskUrgent(${i})" title="Срочно">${ICONS.lightning}</button>`;
+    }
+    if (t.deadline) {
+      bottomItems += `<span class="task-deadline-badge ${t.done ? 'done' : ''}">${ICONS.calendar} ${formatDateDisplay(t.deadline)}</span>`;
+    }
+    let footerHTML = bottomItems ? `<div class="task-bottom-row">${bottomItems}</div>` : '';
+
     tasksHTML += `<li class="task-item ${t.done ? 'done-row' : ''} ${hasDeadline ? 'deadline-row' : ''} ${urgentCls}"
       draggable="true" data-idx="${i}" data-flip-id="dt-${flipKey(t.text)}"
       ondragstart="dayDragStart(event,${i})" ondragover="dayDragOver(event)"
@@ -25,9 +34,8 @@ function buildDayPage() {
       <span class="task-drag" title="Перетащить">⋮⋮</span>
       <div class="task-cb ${t.done ? 'checked' : ''}" onclick="toggleDayTask(${i})"></div>
       <span class="task-name ${t.done ? 'struck' : ''}">${ideaTag}${esc(t.text)}</span>
-      ${dlBadge}
-      <button class="task-urgent-btn ${urgentBtn}" onclick="toggleDayTaskUrgent(${i})" title="Срочно">${ICONS.lightning}</button>
       <button class="task-del" onclick="deleteDayTask(${i})" title="${t.fromIdea ? 'Убрать из дня' : 'Удалить'}">×</button>
+      ${footerHTML}
     </li>`;
   });
   if (!tasksHTML) tasksHTML = `<li class="empty-state">Нет задач — добавьте первую</li>`;
@@ -73,7 +81,7 @@ function buildDayPage() {
   return `
   <div class="page-header">
     <button class="back-btn" onclick="goHome()">← Назад</button>
-    <h2 class="page-heading">Сегодня — ${ACT_D} ${MONTHS_RU[ACT_M]}</h2>
+    <h2 class="page-heading">Сегодня — ${ACT_D} ${MONTHS_GEN[ACT_M]}</h2>
     <div class="days-left-tag">Ещё ${getDays(ACT_Y, ACT_M) - ACT_D} дн.</div>
   </div>
 

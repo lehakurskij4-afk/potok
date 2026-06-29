@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <!-- Настройки для PWA и превращения в приложение на iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Поток">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#050506">
 
-  <!-- Ссылка на иконку (нужно будет добавить картинку) -->
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
 
@@ -24,26 +22,27 @@
   <link rel="stylesheet" href="css/finance.css">
   <link rel="stylesheet" href="css/deadlines.css">
   <link rel="stylesheet" href="css/ideas.css">
+  
   <style>
-    /* ✦ НОВЫЙ ДИЗАЙН ПЛАВАЮЩЕЙ ПАНЕЛИ (Мобилка) ✦ */
+    /* =========================================================
+       1. ПЛАВАЮЩАЯ ПАНЕЛЬ НАВИГАЦИИ (ТЕЛЕФОН)
+    ========================================================= */
     @media (max-width: 768px) {
-      /* Даем место снизу, чтобы контент не прятался за новой панелью */
       body {
         padding-bottom: 110px !important; 
       }
       
       #tabbar {
         position: fixed !important;
-        /* env(safe-area-inset-bottom) автоматически приподнимает панель над полоской iPhone */
         bottom: calc(16px + env(safe-area-inset-bottom)) !important; 
         left: 20px !important;
         right: 20px !important;
         height: 64px !important;
-        background: rgba(28, 28, 30, 0.85) !important; /* Тёмно-серый полупрозрачный */
+        background: rgba(28, 28, 30, 0.85) !important; 
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 32px !important; /* Идеальная форма пилюли */
+        border-radius: 32px !important; 
         display: flex !important;
         justify-content: space-around !important;
         align-items: center !important;
@@ -60,13 +59,12 @@
         justify-content: center;
         width: 50px;
         height: 50px;
-        color: #636366 !important; /* Цвет неактивных иконок (серый iOS) */
+        color: #636366 !important; 
         text-decoration: none;
         border-radius: 50%;
         transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
-      /* Прячем текст на мобилках для чистоты дизайна (как в доке iOS) */
       .tabbar-label {
         display: none !important;
       }
@@ -79,16 +77,14 @@
         transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
-      /* ✦ АКТИВНОЕ СОСТОЯНИЕ ✦ */
       .tabbar-btn.active {
-        color: #fff !important; /* Белая иконка при нажатии */
+        color: #fff !important;
       }
 
       .tabbar-btn.active .tabbar-icon {
-        transform: translateY(-2px); /* Иконка элегантно приподнимается */
+        transform: translateY(-2px); 
       }
 
-      /* Аккуратная точка под иконкой (как в Telegram) */
       .tabbar-btn::after {
         content: '';
         position: absolute;
@@ -107,7 +103,6 @@
         transform: scale(1);
       }
 
-      /* Легкий круглый фон позади активной иконки */
       .tabbar-btn::before {
         content: '';
         position: absolute;
@@ -127,11 +122,134 @@
         transform: translate(-50%, -50%) scale(1);
       }
     }
+
+    /* =========================================================
+       2. ИДЕАЛЬНАЯ СТРУКТУРА ЗАДАЧ (БЕЗ ПОЛОМОК)
+    ========================================================= */
+    * {
+      -webkit-tap-highlight-color: transparent !important;
+    }
+
+    /* Возвращаем оригинальную карточку, просто добавляем отступ снизу */
+ 
+    .task-item {
+      position: relative !important; 
+      padding-bottom: 40px !important; 
+    }
+    
+    .task-item:active, .task-item:focus {
+      background-color: transparent !important;
+      transform: none !important;
+    }
+
+    /* ✦ НОВЫЙ КОНТЕЙНЕР ТОЛЬКО ДЛЯ МОЛНИИ И ДАТЫ ✦ */
+    .task-bottom-row {
+      position: absolute !important;
+      bottom: 6px !important;
+      left: 42px !important; /* Ровно под текстом на телефоне */
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 8px !important;
+      z-index: 5 !important;
+    }
+
+    /* Сбрасываем кнопки, чтобы они аккуратно лежали внутри контейнера */
+    .task-urgent-btn {
+      position: static !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 26px !important;
+      padding: 0 10px !important;
+      background: rgba(255,255,255,0.06) !important;
+      border-radius: 6px !important;
+      color: #52525b !important;
+      border: none !important;
+      margin: 0 !important;
+      cursor: pointer !important;
+      transform: none !important;
+    }
+    .task-urgent-btn svg { width: 14px !important; height: 14px !important; }
+    .task-urgent-btn.active {
+      color: #FBBF24 !important; 
+      background: rgba(251, 191, 36, 0.1) !important;
+    }
+
+    .task-deadline-badge {
+      position: static !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      height: 26px !important;
+      padding: 0 10px !important;
+      background: rgba(239, 68, 68, 0.1) !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      color: #EF4444 !important; 
+      margin: 0 !important;
+      white-space: nowrap !important;
+      transform: none !important;
+    }
+    .task-deadline-badge svg {
+      width: 13px !important; 
+      height: 13px !important; 
+      stroke: #EF4444 !important; 
+      margin: 0 !important;
+    }
+
+    /* На ПК сдвигаем нижний ряд правее из-за иконки перетаскивания ⋮⋮ */
+    @media (min-width: 768px) {
+      .task-bottom-row {
+        left: 68px !important; 
+      }
+    }
+
+    /* =========================================================
+       3. СТИЛИ ДЛЯ СНА (Для совместимости с sleep.js)
+    ========================================================= */
+    .sleep-card {
+      background: transparent;
+      margin-bottom: 24px;
+    }
+    .sleep-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      font-size: 14px;
+      color: #fff;
+    }
+    .sleep-del {
+      background: none; border: none; color: #636366; font-size: 18px; padding: 0; cursor: pointer;
+    }
+    .sleep-times {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 12px 0;
+      border-top: 1px dashed rgba(255,255,255,0.15);
+      border-bottom: 1px dashed rgba(255,255,255,0.15);
+      margin-bottom: 10px;
+    }
+    .sleep-arrow { color: #636366; font-weight: 400; font-size: 12px; letter-spacing: -1px; }
+    .sleep-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+    .sleep-qual { font-weight: 600; display:flex; align-items:center; gap: 6px; }
+    .sleep-edit-btn { background: none; border: none; font-size: 14px; cursor: pointer; padding: 4px; opacity: 0.7; }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar (desktop, >768px) -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-title">✦</div>
     
@@ -176,7 +294,6 @@
 
   <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
-  <!-- Tab bar (mobile, ≤768px) -->
   <nav class="tabbar" id="tabbar">
     
     <a class="tabbar-btn" data-view="habits" onclick="navTo('habits')">
@@ -209,16 +326,16 @@
     
   </nav>
 
-  <script src="js/state.js?v=4"></script>
-  <script src="js/date-picker.js?v=4"></script>
-  <script src="js/charts.js?v=4"></script>
-  <script src="js/home.js?v=4"></script>
-  <script src="js/day.js?v=4"></script>
-  <script src="js/month.js?v=4"></script>
-  <script src="js/finance.js?v=4"></script>
-  <script src="js/deadlines.js?v=4"></script>
-  <script src="js/ideas.js?v=4"></script>
-  <script src="js/sleep.js?v=4"></script>
-  <script src="js/render.js?v=4"></script>
+  <script src="js/state.js?v=6"></script>
+  <script src="js/date-picker.js?v=6"></script>
+  <script src="js/charts.js?v=6"></script>
+  <script src="js/home.js?v=6"></script>
+  <script src="js/day.js?v=6"></script>
+  <script src="js/month.js?v=6"></script>
+  <script src="js/finance.js?v=6"></script>
+  <script src="js/deadlines.js?v=6"></script>
+  <script src="js/ideas.js?v=6"></script>
+  <script src="js/sleep.js?v=6"></script>
+  <script src="js/render.js?v=6"></script>
 </body>
 </html>
